@@ -257,13 +257,13 @@ app.get(['/admin', '/admin/*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
 });
 
-// Serve Root SPA / Portfolio fallback
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Export app for Vercel / serverless environment
+module.exports = app;
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`\n🚀 DOMINOVA Server running on http://localhost:${PORT}`);
-  console.log(`🔐 Admin Panel: http://localhost:${PORT}/admin\n`);
-});
+// Start Server locally
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 DOMINOVA Server running on http://localhost:${PORT}`);
+    console.log(`🔐 Admin Panel: http://localhost:${PORT}/admin\n`);
+  });
+}
