@@ -73,12 +73,10 @@ const staticOptions = {
   }
 };
 
-// Static Files (Handled by Express locally; Vercel CDN serves static assets in production)
-if (!process.env.VERCEL) {
-  app.use('/uploads', express.static(UPLOADS_DIR, staticOptions));
-  app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
-  app.use(express.static(__dirname, staticOptions));
-}
+// Static Files
+app.use('/uploads', express.static(UPLOADS_DIR, staticOptions));
+app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
+app.use(express.static(__dirname, staticOptions));
 
 // JWT Auth Middleware
 function requireAuth(req, res, next) {
@@ -257,6 +255,19 @@ app.post('/api/upload', requireAuth, upload.array('files', 10), (req, res) => {
 // Serve Admin routes (SPA fallback for /admin and /admin/*)
 app.get(['/admin', '/admin/*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'index.html'));
+});
+
+// Serve Main Website Root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Fallback for SPA routing
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Export app for Vercel / serverless environment
