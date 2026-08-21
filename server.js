@@ -73,10 +73,12 @@ const staticOptions = {
   }
 };
 
-// Static Files
-app.use('/uploads', express.static(UPLOADS_DIR, staticOptions));
-app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
-app.use(express.static(__dirname, staticOptions));
+// Static Files (Handled by Express locally; Vercel CDN serves static assets in production)
+if (!process.env.VERCEL) {
+  app.use('/uploads', express.static(UPLOADS_DIR, staticOptions));
+  app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
+  app.use(express.static(__dirname, staticOptions));
+}
 
 // JWT Auth Middleware
 function requireAuth(req, res, next) {
